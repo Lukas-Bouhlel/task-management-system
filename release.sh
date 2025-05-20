@@ -10,4 +10,4 @@ npx standard-version
 echo "📤 Pushing tags and changelog..."
 git push origin master --follow-tags
 
-echo "✅ Release done!"
+echo "✅ Release done !"
