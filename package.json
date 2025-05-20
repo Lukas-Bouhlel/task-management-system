@@ -5,8 +5,7 @@
   "scripts": {
     "start": "nodemon --legacy-watch index.js",
     "test": "jest --runInBand",
-    "lint": "eslint .",
-    "build": "build"
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",

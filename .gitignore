@@ -1,1 +1,41 @@
-/node_modules
+# Fichiers node
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+package-lock.json
+yarn.lock
+
+# Environnement
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Répertoires de build
+/dist
+/build
+/coverage
+
+# Logs
+logs
+*.log
+
+# Fichiers du système d'exploitation
+.DS_Store
+Thumbs.db
+
+# Fichiers d'éditeur
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Fichiers de base de données SQLite
+*.sqlite
+*.sqlite3
+
+# Fichiers temporaires
+tmp/
+temp/
