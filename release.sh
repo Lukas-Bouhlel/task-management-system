@@ -8,6 +8,6 @@ echo "🔧 Running release with standard-version..."
 npx standard-version
 
 echo "📤 Pushing tags and changelog..."
-git push origin main --follow-tags
+git push origin master --follow-tags
 
 echo "✅ Release done!"
