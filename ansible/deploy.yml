@@ -1,0 +1,7 @@
+---
+- name: Deploy Node.js app to GCP VM
+  hosts: vm
+  become: true
+
+  roles:
+    - nodejs

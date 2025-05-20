@@ -1,0 +1,32 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install Node.js and npm
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - nodejs
+    - npm
+
+- name: Clone application repository
+  git:
+    repo: "https://github.com/Lukas-Bouhlel/task-management-system.git"
+    dest: /home/lukasbouhlel/app/
+    version: master
+    force: yes
+    update: yes
+  become: false
+
+- name: Install npm dependencies
+  npm:
+    path: /home/lukasbouhlel/app/
+
+- name: Start the app (simple background example)
+  shell: |
+    nohup npm start > /home/lukasbouhlel/app/output.log 2>&1 &
+  args:
+    chdir: /home/lukasbouhlel/app/
+    creates: /tmp/node-app.pid
