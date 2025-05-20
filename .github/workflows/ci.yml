@@ -49,6 +49,7 @@ jobs:
         run: npm run lint
 
       - name: Create Test Database
+        working-directory: ./app
         run: npx sequelize-cli db:create --env test --config ./app/config/config.js
 
       - name: Run Migrations on Test Database
