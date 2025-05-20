@@ -66,6 +66,17 @@ jobs:
     name: Unit Tests
     needs: setup
     runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.TEST_DB_DATABASE }}
+        ports:
+          - '3306:3306'
+        options: --health-cmd="mysqladmin ping -h localhost --password=password" --health-interval=10s --health-timeout=5s --health-retries=5
+    
     strategy:
       matrix:
         node-version: [20.x]
@@ -89,10 +100,58 @@ jobs:
         run: npm install
       
       - name: Run unit tests
-        run: npm test
+        run: npm run test:unit
         env:
           NODE_ENV: test
-          TEST_DB_USERNAME: ${{ secrets.TEST_DB_USERNAME }}
+          TEST_DB_USERNAME: root
+          TEST_DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
           TEST_DB_DATABASE: ${{ secrets.TEST_DB_DATABASE }}
-          TEST_DB_HOST: ${{ secrets.TEST_DB_HOST }}
-          TEST_DB_DIALECT: ${{ secrets.TEST_DB_DIALECT }}
+          TEST_DB_HOST: 127.0.0.1
+          TEST_DB_DIALECT: mysql
+
+  integration-tests:
+    name: Integration Tests
+    needs: setup
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.TEST_DB_DATABASE }}
+        ports:
+          - '3306:3306'
+        options: --health-cmd="mysqladmin ping -h localhost --password=password" --health-interval=10s --health-timeout=5s --health-retries=5
+    
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      
+      - name: Restore node modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+      
+      - name: Install dependencies if cache miss
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm install
+      
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          NODE_ENV: test
+          TEST_DB_USERNAME: root
+          TEST_DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          TEST_DB_DATABASE: ${{ secrets.TEST_DB_DATABASE }}
+          TEST_DB_HOST: 127.0.0.1
+          TEST_DB_DIALECT: mysql
