@@ -10,7 +10,7 @@ jobs:
 
   # === 1. Install dependencies ===
   install:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest 
 
     steps:
       - name: Checkout repository
