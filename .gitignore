@@ -5,16 +5,11 @@ yarn-error.log
 yarn-debug.log
 package-lock.json
 yarn.lock
+infra/.terraform
 
 #files
 .ssh
 .secrets
-infra/.terraform
-infra/*.tfstate
-infra/*.tfstate.backup
-infra/terraform.tfstate
-infra/terraform.tfstate.backup
-infra/
 
 # Environnement
 .env
