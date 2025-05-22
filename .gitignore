@@ -9,10 +9,11 @@ yarn.lock
 #files
 .ssh
 .secrets
-*.tfstate
-*.tfstate.backup
-.terraform/
 infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.backup
+infra/terraform.tfstate
+infra/terraform.tfstate.backup
 
 # Environnement
 .env
