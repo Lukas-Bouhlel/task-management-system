@@ -5,6 +5,8 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/), et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
 
+### [1.0.8](https://github.com/Lukas-Bouhlel/task-management-system/compare/v1.0.7...v1.0.8) (2025-06-10)
+
 ### [1.0.7](https://github.com/Lukas-Bouhlel/task-management-system/compare/v1.0.6...v1.0.7) (2025-06-10)
 
 ### 1.0.6 (2025-06-10)
