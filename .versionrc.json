@@ -1,0 +1,77 @@
+{
+  "types": [
+    {
+      "type": "feat",
+      "section": "🚀 Nouvelles fonctionnalités"
+    },
+    {
+      "type": "fix",
+      "section": "🐛 Corrections de bugs"
+    },
+    {
+      "type": "perf",
+      "section": "⚡ Améliorations de performance"
+    },
+    {
+      "type": "refactor",
+      "section": "♻️ Refactoring"
+    },
+    {
+      "type": "docs",
+      "section": "📚 Documentation"
+    },
+    {
+      "type": "test",
+      "section": "🧪 Tests"
+    },
+    {
+      "type": "build",
+      "section": "🏗️ Build et CI"
+    },
+    {
+      "type": "ci",
+      "section": "🏗️ Build et CI"
+    },
+    {
+      "type": "chore",
+      "section": "🔧 Maintenance"
+    },
+    {
+      "type": "style",
+      "hidden": true
+    },
+    {
+      "type": "revert",
+      "section": "⏪ Annulations"
+    }
+  ],
+  "commitUrlFormat": "https://github.com/Lukas-Bouhlel/task-management-system/commit/{{hash}}",
+  "compareUrlFormat": "https://github.com/Lukas-Bouhlel/task-management-system/compare/{{previousTag}}...{{currentTag}}",
+  "issueUrlFormat": "https://github.com/Lukas-Bouhlel/task-management-system/issues/{{id}}",
+  "userUrlFormat": "https://github.com/{{user}}",
+  "releaseCommitMessageFormat": "chore(release): {{currentTag}}",
+  "skip": {
+    "bump": false,
+    "changelog": false,
+    "commit": false,
+    "tag": false
+  },
+  "bumpFiles": [
+    {
+      "filename": "package.json",
+      "type": "json"
+    }
+  ],
+  "packageFiles": [
+    {
+      "filename": "package.json",
+      "type": "json"
+    }
+  ],
+  "header": "# Changelog\n\nToutes les modifications notables de ce projet seront documentées dans ce fichier.\n\nLe format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/), et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).\n\n",
+  "preset": "conventionalcommits",
+  "presetConfig": {
+    "issuePrefixes": ["#"],
+    "issueUrlFormat": "https://github.com/Lukas-Bouhlel/task-management-system/issues/{{id}}"
+  }
+}

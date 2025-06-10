@@ -107,8 +107,3 @@ jobs:
 
       - name: Make release script executable
         run: chmod +x ./release.sh
-
-      - name: Run release script
-        run: ./release.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

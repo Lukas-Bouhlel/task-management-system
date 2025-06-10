@@ -1,0 +1,177 @@
+# .github/workflows/release.yml
+name: Release with Standard-Version
+
+on:
+  workflow_run:
+    workflows: ["ci_workflow"]
+    types:
+      - completed
+  push:
+    branches: [master]
+    paths-ignore:
+      - 'CHANGELOG.md'
+      - 'package.json'
+      - 'package-lock.json'
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Type de release (patch, minor, major, prerelease)'
+        required: false
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - prerelease
+
+jobs:
+  release:
+    if: "!contains(github.event.head_commit.message, 'chore(release):')"
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Récupère tout l'historique pour standard-version
+          fetch-depth: 0
+          # Utilise un token avec permissions pour pusher
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Run tests
+        run: npm test
+      
+      - name: Run standard-version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            # Release manuelle avec type spécifié
+            case "${{ github.event.inputs.release_type }}" in
+              "major")
+                npx standard-version --release-as major
+                ;;
+              "minor")
+                npx standard-version --release-as minor
+                ;;
+              "patch")
+                npx standard-version --release-as patch
+                ;;
+              "prerelease")
+                npx standard-version --prerelease
+                ;;
+            esac
+          else
+            # Release automatique basée sur les commits conventionnels
+            npx standard-version
+          fi
+      
+      - name: Get new version
+        id: version
+        run: |
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "🚀 Nouvelle version: $NEW_VERSION"
+      
+      - name: Push changes and tags
+        run: |
+          # Push les changements (CHANGELOG.md, package.json, tag)
+          git push origin master --follow-tags
+          echo "✅ Changements poussés vers le dépôt"
+      
+      - name: Extract changelog for release
+        id: changelog
+        run: |
+          # Extrait les changements de la nouvelle version depuis CHANGELOG.md
+          VERSION=${{ steps.version.outputs.new_version }}
+          
+          # Utilise awk pour extraire la section de la version actuelle
+          CHANGELOG=$(awk "/^### \[$VERSION\]/{flag=1; next} /^### \[.*\]/{flag=0} flag && /^$/{next} flag" CHANGELOG.md)
+          
+          # Si le changelog est vide, utilise une description par défaut
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG="Voir les commits pour plus de détails."
+          fi
+          
+          # Échappe les caractères spéciaux pour GitHub Actions
+          CHANGELOG="${CHANGELOG//'%'/'%25'}"
+          CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+          CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+          
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          release_name: "Release ${{ steps.version.outputs.tag }}"
+          body: |
+            ## 🚀 Task Management System ${{ steps.version.outputs.tag }}
+            
+            ### 📋 Changements
+            ${{ steps.changelog.outputs.changelog }}
+            
+            ### 📦 Installation
+            ```bash
+            npm install task-management-system@${{ steps.version.outputs.new_version }}
+            ```
+            
+            ### 🔄 Docker
+            ```bash
+            docker pull ghcr.io/${{ github.repository }}:${{ steps.version.outputs.new_version }}
+            ```
+            
+            ---
+            Généré automatiquement par [standard-version](https://github.com/conventional-changelog/standard-version)
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.new_version, '-') }}
+      
+      - name: Trigger deployment
+        if: "!contains(steps.version.outputs.new_version, '-')"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Déclenche le workflow de déploiement
+            try {
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'cd_workflow.yml',
+                ref: 'master',
+                inputs: {
+                  version: '${{ steps.version.outputs.tag }}',
+                  environment: 'production'
+                }
+              });
+              console.log('✅ Déploiement déclenché pour la version ${{ steps.version.outputs.tag }}');
+            } catch (error) {
+              console.log('⚠️ Impossible de déclencher le déploiement:', error.message);
+            }
+      
+      - name: Notify success
+        run: |
+          echo "🎉 Release ${{ steps.version.outputs.tag }} créée avec succès!"
+          echo "📝 CHANGELOG.md et package.json mis à jour automatiquement"
+          echo "🔗 Voir: https://github.com/${{ github.repository }}/releases/tag/${{ steps.version.outputs.tag }}"
