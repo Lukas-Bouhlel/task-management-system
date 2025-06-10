@@ -1,0 +1,6 @@
+- name: Test simple de connexion
+  hosts: all
+  become: false
+  tasks:
+    - name: Ping la machine distante
+      ping:
