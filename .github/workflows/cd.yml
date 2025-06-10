@@ -27,6 +27,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install ansible
 
+      - name: Configure SSH access
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+
       - name: Debug SSH key presence
         run: |
           if [ ! -s ~/.ssh/id_rsa ]; then
@@ -34,14 +41,8 @@ jobs:
             exit 1
           else
             echo "✅ SSH private key loaded."
+            echo "SSH key size: $(wc -c < ~/.ssh/id_rsa) bytes"
           fi
-
-      - name: Configure SSH access
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
       - name: Run Ansible Playbook
         run: ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -v
