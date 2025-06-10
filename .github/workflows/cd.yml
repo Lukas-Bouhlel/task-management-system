@@ -34,15 +34,5 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Debug SSH key presence
-        run: |
-          if [ ! -s ~/.ssh/id_rsa ]; then
-            echo "❌ SSH private key is empty!"
-            exit 1
-          else
-            echo "✅ SSH private key loaded."
-            echo "SSH key size: $(wc -c < ~/.ssh/id_rsa) bytes"
-          fi
-
       - name: Run Ansible Playbook
         run: ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -v
