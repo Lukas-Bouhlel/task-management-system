@@ -1,6 +1,11 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+Toutes les modifications notables de ce projet seront documentées dans ce fichier.
+
+Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/), et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
+
+
+### [1.0.7](https://github.com/Lukas-Bouhlel/task-management-system/compare/v1.0.6...v1.0.7) (2025-06-10)
 
 ### 1.0.6 (2025-06-10)
 
