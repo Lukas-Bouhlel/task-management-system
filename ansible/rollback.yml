@@ -1,0 +1,24 @@
+---
+- name: Rollback to previous stable state
+  hosts: vm
+  become: true
+
+  tasks:
+    - name: Stop the current application
+      command: pm2 stop all
+      ignore_errors: yes
+
+    - name: Restore from snapshot
+      command: >
+        gcloud compute disks restore node-api-vm
+        --source-snapshot=snapshot-stable
+        --zone=europe-west1-b
+        --project=skilled-nation-460410-m3
+      register: restore_snapshot
+
+    - name: Display restore info
+      debug:
+        var: restore_snapshot
+
+    - name: Start the previous stable version of the application
+      command: pm2 start all

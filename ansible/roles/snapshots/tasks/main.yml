@@ -1,0 +1,22 @@
+---
+- name: Copy service account key file to remote machine
+  copy:
+    src: /home/lukas/task-management-system/.secrets/terraform-key.json
+    dest: /tmp/terraform-key.json
+    mode: '0600'
+- name: Authenticate gcloud with service account
+  command: gcloud auth activate-service-account --key-file=/tmp/terraform-key.json
+  register: gcloud_auth
+  ignore_errors: yes
+
+- name: Create a disk snapshot using gcloud
+  command: >
+    gcloud compute disks snapshot node-api-vm
+    --zone=europe-west1-b
+    --snapshot-names=snapshot-{{ ansible_date_time.iso8601_basic_short | regex_replace('[^a-zA-Z0-9]', '-') | lower | regex_replace('-+', '-') | regex_replace('^-|-$', '') }}
+    --project=skilled-nation-460410-m3
+  register: snapshot
+
+- name: Display snapshot info
+  debug:
+    var: snapshot

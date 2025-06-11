@@ -1,0 +1,9 @@
+# test-disk-name.yml
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - set_fact:
+        disk_name: "node-api-vm"
+
+    - debug:
+        var: disk_name
