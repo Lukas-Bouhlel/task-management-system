@@ -9,8 +9,8 @@ on:
 jobs:
   deploy:
     if: >
-        github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.head_branch == 'master'
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'master'
     runs-on: ubuntu-latest
 
     steps:
@@ -36,3 +36,14 @@ jobs:
 
       - name: Run Ansible Playbook
         run: ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -v
+
+      - name: Check deployment status
+        id: check-status
+        run: |
+          echo "DEPLOYMENT_FAILED=false" >> $GITHUB_ENV
+
+      - name: Trigger Rollback if needed
+        if: env.DEPLOYMENT_FAILED == 'true'
+        run: |
+          echo "Déploiement échoué, déclenchement du rollback..."
+          ansible-playbook -i ansible/inventory.ini ansible/rollback.yml -v

@@ -10,8 +10,8 @@ resource "google_compute_instance" "default" {
   }
 
   network_interface {
-    network       = "default"
-    access_config {}  # IP externe
+    network = "default"
+    access_config {} # IP externe
   }
 
   metadata = {
@@ -32,8 +32,38 @@ resource "google_compute_firewall" "allow_http_ssh" {
 
   allow {
     protocol = "tcp"
-    ports    = ["22", "3000"]  # SSH + port API
+    ports    = ["22", "3000"] # SSH + port API
   }
 
-  source_ranges = ["0.0.0.0/0"]  # à limiter en prod
+  source_ranges = ["0.0.0.0/0"] # à limiter en prod
+}
+
+resource "google_compute_resource_policy" "daily_snapshot" {
+  name   = "daily-snapshot-policy"
+  region = var.region
+  snapshot_schedule_policy {
+    schedule {
+      daily_schedule {
+        days_in_cycle = 1
+        start_time = "04:00"  # Spécifiez l'heure de début pour le snapshot
+      }
+    }
+    retention_policy {
+      max_retention_days    = 7
+      on_source_disk_delete = "APPLY_RETENTION_POLICY"
+    }
+    snapshot_properties {
+      labels = {
+        my_label = "value"
+      }
+      storage_locations = ["us"]
+      guest_flush       = false
+    }
+  }
+}
+
+resource "google_compute_disk_resource_policy_attachment" "disk_attachment" {
+  disk = "node-api-vm"
+  name = "daily-snapshot-policy"
+  zone = "europe-west1-b"
 }
