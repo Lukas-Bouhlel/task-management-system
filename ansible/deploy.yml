@@ -3,6 +3,6 @@
   hosts: vm
   become: true
   roles:
-    # - nodejs
+    - nodejs
     - snapshots
 
