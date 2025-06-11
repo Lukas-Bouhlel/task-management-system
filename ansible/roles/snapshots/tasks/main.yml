@@ -1,10 +1,10 @@
 ---
 - name: Copy service account key file to remote machine
   copy:
-    src: .secrets/terraform-key.json
+    src: /tmp/.secrets/terraform-key.json
     dest: /tmp/terraform-key.json
     mode: '0600'
-
+    
 - name: Authenticate gcloud with service account
   command: gcloud auth activate-service-account --key-file=/tmp/terraform-key.json
   register: gcloud_auth

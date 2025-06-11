@@ -34,6 +34,11 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Recreate service account key file
+        run: |
+          mkdir -p /tmp/.secrets
+          echo "${{ secrets.TERRAFORM_KEY_JSON }}" > /tmp/.secrets/terraform-key.json
+
       - name: Run Ansible Playbook
         run: ansible-playbook -i ansible/inventory.ini ansible/deploy.yml -v
 
