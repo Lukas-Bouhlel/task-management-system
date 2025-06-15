@@ -4,7 +4,6 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "start:pm2": "NODE_ENV=production pm2 start index.js --name \"node-api\"",
     "test": "jest --runInBand",
     "lint": "eslint ."
   },
