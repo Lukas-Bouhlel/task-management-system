@@ -10,7 +10,7 @@
   register: gcloud_auth
   ignore_errors: yes
 
-- name: Create a disk snapshot using gcloud
+- name: Create a disk snapshot using gcloud 
   command: >
     gcloud compute disks snapshot node-api-vm
     --zone=europe-west1-b
