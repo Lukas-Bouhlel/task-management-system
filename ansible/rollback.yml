@@ -8,17 +8,43 @@
       command: pm2 stop all
       ignore_errors: yes
 
-    - name: Restore from snapshot
+    - name: Check if snapshot exists
       command: >
-        gcloud compute disks restore node-api-vm
-        --source-snapshot=snapshot-stable
+        gcloud compute snapshots describe snapshot-stable
+        --project=skilled-nation-460410-m3
+      register: snapshot_check
+      failed_when: "'NOT_FOUND' in snapshot_check.stderr"
+
+    - name: Set restored disk name variable
+      set_fact:
+        restored_disk_name: "node-api-vm-restored-{{ ansible_date_time.iso8601_basic_short | regex_replace('T', '-') }}"
+
+    - name: Create a new disk from snapshot with unique name
+      command: >
+        gcloud compute disks create {{ restored_disk_name }}
+        --source-snapshot=snapshot-node-api-vm
         --zone=europe-west1-b
         --project=skilled-nation-460410-m3
-      register: restore_snapshot
+      register: create_disk
 
-    - name: Display restore info
+    - name: Display disk creation info
       debug:
-        var: restore_snapshot
+        var: create_disk
+
+    - name: Detach the old disk (if necessary)
+      command: >
+        gcloud compute instances detach-disk node-api-vm
+        --disk=node-api-vm
+        --zone=europe-west1-b
+        --project=skilled-nation-460410-m3
+      ignore_errors: yes
+
+    - name: Attach the new disk
+      command: >
+        gcloud compute instances attach-disk node-api-vm
+        --disk={{ restored_disk_name }}
+        --zone=europe-west1-b
+        --project=skilled-nation-460410-m3
 
     - name: Start the previous stable version of the application
       command: pm2 start all
