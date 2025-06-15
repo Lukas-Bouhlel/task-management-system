@@ -38,3 +38,49 @@ resource "google_compute_resource_policy" "daily_snapshot" {
     }
   }
 }
+
+resource "google_compute_instance" "loki" {
+  name         = "loki-instance"
+  machine_type = var.machine_type
+  zone         = var.zone
+
+  boot_disk {
+    initialize_params {
+      image = var.disk_image
+    }
+  }
+
+  network_interface {
+    network = "default"
+    access_config {
+      // Épingle une adresse IP externe à l'instance
+    }
+  }
+
+  metadata = {
+    ssh-keys = "lukasbouhlel:${file(var.ssh_public_key)}"
+  }
+}
+
+resource "google_compute_instance" "grafana" {
+  name         = "grafana-instance"
+  machine_type = var.machine_type
+  zone         = var.zone
+
+  boot_disk {
+    initialize_params {
+      image = var.disk_image
+    }
+  }
+
+  network_interface {
+    network = "default"
+    access_config {
+      // Épingle une adresse IP externe à l'instance
+    }
+  }
+
+  metadata = {
+    ssh-keys = "lukasbouhlel:${file(var.ssh_public_key)}"
+  }
+}

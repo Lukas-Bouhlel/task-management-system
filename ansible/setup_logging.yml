@@ -1,0 +1,8 @@
+---
+- name: Setup Loki, Promtail, and Grafana
+  hosts: vm
+  become: true
+  roles:
+    - loki
+    - promtail
+    - grafana

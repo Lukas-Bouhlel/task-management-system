@@ -1,0 +1,13 @@
+---
+- name: Install unzip on the VM
+  hosts: vm
+  become: true
+  tasks:
+    - name: Update apt package index
+      apt:
+        update_cache: yes
+
+    - name: Install unzip
+      apt:
+        name: unzip
+        state: present

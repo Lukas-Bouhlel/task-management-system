@@ -29,8 +29,13 @@
   npm:
     path: /home/lukasbouhlel/app/
 
+- name: Copy .env.production file
+  copy:
+    src: /path/to/your/.env.production
+    dest: /home/lukasbouhlel/app/.env.production
+
 - name: Start the app with PM2
-  shell: pm2 start npm --name "node-api" -- start
+  shell: pm2 start ecosystem.config.js --env production
   args:
     chdir: /home/lukasbouhlel/app/
   register: pm2_start

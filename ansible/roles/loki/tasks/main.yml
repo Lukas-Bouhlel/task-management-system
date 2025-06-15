@@ -1,0 +1,45 @@
+---
+- name: Download Loki
+  get_url:
+    url: "https://github.com/grafana/loki/releases/download/v2.8.0/loki-linux-amd64.zip"
+    dest: "/tmp/loki-linux-amd64.zip"
+
+- name: Unzip Loki
+  unarchive:
+    src: "/tmp/loki-linux-amd64.zip"
+    dest: "/usr/local/bin"
+    remote_src: yes
+
+- name: Create Loki config file
+  copy:
+    dest: "/etc/loki-config.yaml"
+    content: |
+      auth_enabled: false
+
+      server:
+        http_listen_port: 3100
+
+      common:
+        path_prefix: /tmp/loki
+        storage:
+          filesystem:
+            chunks_directory: /tmp/loki/chunks
+            rules_directory: /tmp/loki/rules
+        replication_factor: 1
+        ring:
+          instance_addr: 127.0.0.1
+          kvstore:
+            store: inmemory
+
+      schema_config:
+        configs:
+          - from: 2020-10-24
+            store: boltdb-shipper
+            object_store: filesystem
+            schema: v11
+            index:
+              prefix: index_
+              period: 24h
+
+- name: Start Loki
+  command: nohup /usr/local/bin/loki-linux-amd64 -config.file=/etc/loki-config.yaml &
